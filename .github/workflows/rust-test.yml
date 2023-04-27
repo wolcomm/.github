@@ -1,0 +1,53 @@
+name: "Rust test workflow"
+
+on:
+  workflow_call:
+    inputs:
+      toolchain:
+        type: string
+        required: true
+      args:
+        type: string
+        required: true
+
+jobs:
+
+  audit:
+    name: audit
+    runs-on: ubuntu-latest
+    steps:
+      - name: checkout
+        uses: actions/checkout@v3
+      - name: audit
+        uses: actions-rs/audit-check@v1
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+  test:
+    name: test
+    needs: [audit]
+    runs-on: ubuntu-latest
+    steps:
+      - name: checkout
+        uses: actions/checkout@v3
+      - name: install rust
+        uses: actions-rs/toolchain@v1
+        with:
+          profile: minimal
+          toolchain: ${{ inputs.toolchain }}
+          override: true
+          components: llvm-tools-preview
+      - name: install cargo-llvm-cov
+        uses: taiki-e/install-action@v2
+        with:
+          tool: cargo-llvm-cov
+      - name: run tests
+        uses: actions-rs/cargo@v1
+        with:
+          command: llvm-cov
+          args: --all-features --lcov --output-path coverage.lcov ${{ inputs.args }}
+      - name: upload coverage data
+        uses: codecov/codecov-action@v3
+        with:
+          files: coverage.lcov
+          fail_ci_if_error: true

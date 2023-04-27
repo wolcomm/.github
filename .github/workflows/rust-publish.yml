@@ -1,0 +1,29 @@
+name: "Rust publish workflow"
+
+on:
+  workflow_call:
+    secrets:
+      CRATES_TOKEN:
+        required: true
+
+jobs:
+
+  publish:
+    name: publish
+    if: ${{ github.event_name == 'push' &&
+            startsWith(github.ref, 'refs/tag') }}
+    runs-on: ubuntu-latest
+    steps:
+      - name: checkout
+        uses: actions/checkout@v3
+      - name: install
+        uses: actions-rs/toolchain@v1
+        with:
+          profile: minimal
+          toolchain: stable
+          override: true
+      - name: publish
+        uses: actions-rs/cargo@v1
+        with:
+          command: publish
+          args: --token ${{ secrets.CRATES_TOKEN }}
