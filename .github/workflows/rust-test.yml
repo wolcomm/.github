@@ -9,6 +9,9 @@ on:
       args:
         type: string
         required: true
+      build-dependencies:
+        type: string
+        required: false
 
 jobs:
 
@@ -41,6 +44,10 @@ jobs:
         uses: taiki-e/install-action@v2
         with:
           tool: cargo-llvm-cov
+      - name: install build-dependencies
+        if: inputs.build-dependencies != ''
+        run: |
+          sudo apt install ${{ inputs.build-dependencies }}
       - name: run tests
         uses: actions-rs/cargo@v1
         with:

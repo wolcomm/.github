@@ -1,7 +1,11 @@
 name: "Rust lint workflow"
 
 on:
-  workflow_call: {}
+  workflow_call:
+    inputs:
+      build-dependencies:
+        type: string
+        required: false
 
 jobs:
 
@@ -33,6 +37,10 @@ jobs:
           profile: minimal
           toolchain: ${{ matrix.rust }}
           override: true
+      - name: install build-dependencies
+        if: inputs.build-dependencies != ''
+        run: |
+          sudo apt install ${{ inputs.build-dependencies }}
       - name: cargo check
         uses: actions-rs/cargo@v1
         with:
@@ -81,6 +89,10 @@ jobs:
           toolchain: ${{ matrix.rust }}
           override: true
           components: clippy
+      - name: install build-dependencies
+        if: inputs.build-dependencies != ''
+        run: |
+          sudo apt install ${{ inputs.build-dependencies }}
       - name: clippy
         uses: actions-rs/clippy-check@v1
         with:
@@ -105,6 +117,10 @@ jobs:
         uses: taiki-e/install-action@v2
         with:
           tool: cargo-fuzz
+      - name: install build-dependencies
+        if: inputs.build-dependencies != ''
+        run: |
+          sudo apt install ${{ inputs.build-dependencies }}
       - name: check fuzz targets
         uses: actions-rs/cargo@v1
         if: hashFiles('./fuzz/Cargo.toml')
@@ -125,6 +141,10 @@ jobs:
           profile: minimal
           toolchain: nightly
           override: true
+      - name: install build-dependencies
+        if: inputs.build-dependencies != ''
+        run: |
+          sudo apt install ${{ inputs.build-dependencies }}
       - name: generate docs
         uses: actions-rs/cargo@v1
         with:

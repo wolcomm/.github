@@ -6,6 +6,9 @@ on:
       package:
         required: false
         type: string
+      build-dependencies:
+        type: string
+        required: false
     secrets:
       CRATES_TOKEN:
         required: true
@@ -26,6 +29,10 @@ jobs:
           profile: minimal
           toolchain: stable
           override: true
+      - name: install build-dependencies
+        if: inputs.build-dependencies != ''
+        run: |
+          sudo apt install ${{ inputs.build-dependencies }}
       - name: determine package
         if: inputs.package != ''
         run: |
