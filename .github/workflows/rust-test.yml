@@ -12,6 +12,9 @@ on:
       build-dependencies:
         type: string
         required: false
+    secrets:
+      CODECOV_TOKEN:
+        required: true
 
 jobs:
 
@@ -60,6 +63,7 @@ jobs:
       - name: upload coverage data
         uses: codecov/codecov-action@v3
         with:
+          token: ${{ secrets.CODECOV_TOKEN }}
           files: coverage.lcov
           fail_ci_if_error: true
           name: ${{ format('{0} {1}', inputs.toolchain, inputs.args) }}
