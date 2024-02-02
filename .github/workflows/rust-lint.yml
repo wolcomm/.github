@@ -25,7 +25,7 @@ jobs:
           tool: cargo-audit
       - name: audit
         run: |
-          cargo audit --color always --deny all
+          cargo audit --color always --deny warnings
 
   check:
     name: check
