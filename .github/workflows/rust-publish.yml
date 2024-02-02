@@ -25,12 +25,8 @@ jobs:
         uses: actions/checkout@v4
         with:
           submodules: true
-      - name: install
-        uses: actions-rs/toolchain@v1
-        with:
-          profile: minimal
-          toolchain: stable
-          override: true
+      - name: install rust
+        uses: dtolnay/rust-toolchain@stable
       - name: install build-dependencies
         if: inputs.build-dependencies != ''
         run: |
@@ -40,7 +36,5 @@ jobs:
         run: |
           echo "PACKAGE_ARG=-p ${{ inputs.package }}" >>"$GITHUB_ENV"
       - name: publish
-        uses: actions-rs/cargo@v1
-        with:
-          command: publish
-          args: --token ${{ secrets.CRATES_TOKEN }} ${{ env.PACKAGE_ARG }}
+        run: |
+          cargo publish --token ${{ secrets.CRATES_TOKEN }} ${{ env.PACKAGE_ARG }}

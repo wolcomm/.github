@@ -26,10 +26,15 @@ jobs:
         uses: actions/checkout@v4
         with:
           submodules: true
-      - name: audit
-        uses: actions-rs/audit-check@v1
+      - name: install rust
+        uses: dtolnay/rust-toolchain@stable
+      - name: install cargo-audit
+        uses: taiki-e/install-action@v2
         with:
-          token: ${{ secrets.GITHUB_TOKEN }}
+          tool: cargo-audit
+      - name: audit
+        run: |
+          cargo audit --color always --deny all
 
   test:
     name: test
@@ -41,11 +46,9 @@ jobs:
         with:
           submodules: true
       - name: install rust
-        uses: actions-rs/toolchain@v1
+        uses: dtolnay/rust-toolchain@master
         with:
-          profile: minimal
           toolchain: ${{ inputs.toolchain }}
-          override: true
           components: llvm-tools-preview
       - name: install cargo-llvm-cov
         uses: taiki-e/install-action@v2
@@ -56,10 +59,12 @@ jobs:
         run: |
           sudo apt install ${{ inputs.build-dependencies }}
       - name: run tests
-        uses: actions-rs/cargo@v1
-        with:
-          command: llvm-cov
-          args: --all-features --lcov --output-path coverage.lcov ${{ inputs.args }}
+        run: |
+          cargo llvm-cov \
+              --all-features \
+              --lcov \
+              --output-path coverage.lcov \
+              ${{ inputs.args }}
       - name: upload coverage data
         uses: codecov/codecov-action@v3
         with:
