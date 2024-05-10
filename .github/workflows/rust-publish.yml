@@ -17,8 +17,6 @@ jobs:
 
   publish:
     name: publish
-    if: ${{ github.event_name == 'push' &&
-            startsWith(github.ref, 'refs/tag') }}
     runs-on: ubuntu-latest
     steps:
       - name: checkout
